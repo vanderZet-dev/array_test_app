@@ -1,92 +1,70 @@
-﻿using array_test_app.Tools;
-using System;
+﻿using System;
+using System.Threading;
 
 namespace array_test_app
 {
     class Program
-    {
+    {     
+        private static int zeroIsFind = 0;
+
+        private static readonly int maxIndexForCheck = 3;
+
         static void Main(string[] args) {
 
-            var arraySize = GetRandomArraySize();
+            int[] someArray = { 9, 5, 6, 6, 9, 8, 8 };
+            int lastIndexToCheck = someArray.Length - maxIndexForCheck - 1;
 
-            Console.WriteLine();
-
-            int[] testArray = InitialArrayBySize(arraySize);
-
-            Console.WriteLine();
-
-            var mValue = GetRandomMValue(testArray.Length);
-
-            Console.WriteLine();
-
-            if (isZeroInArrayBeforeIndex(testArray, mValue))
-            {
-                Console.WriteLine("ДА - нулевое значение содержится в массиве.");
-            }
-            else Console.WriteLine("НЕТ - нулевое значение НЕ содержится в массиве.");
-
-            Console.WriteLine();
+            RecursionAnalise(someArray, lastIndexToCheck);
 
             Console.ReadKey();
-
         }
 
-        private static int GetRandomArraySize() {
+        private static void RecursionAnalise(int[] someArray, int nextIndex) {
 
-            var size = GetRandomInteger();
+            int currentValue = someArray[nextIndex];
 
-            Console.WriteLine($"Тестируемый размер массива: {size}");
-            return size;
+            int result = ConvertToOneZero(currentValue);
+            translateResult(result);
+            ShowResult();            
+
+            nextIndex = nextIndex - GetIndexDecreasing(nextIndex);
+            RecursionAnalise(someArray, nextIndex);
         }
 
-        private static int GetRandomInteger(int maxValue = 21) {
+        private static int GetIndexDecreasing(int currentIndex) {
 
-            var rand = new Random();
-            var value = rand.Next(10, maxValue);
-            
-            return value;
+            int coef = ConvertToOneZero(currentIndex);
+            int delta = coef * 1 + (1 - coef) * 0;
+
+            return delta;
         }
 
-        private static int GetRandomMValue(int maxValue) {
+        private static void ShowResult() {
 
-            var value = GetRandomInteger(maxValue);
+            Thread.Sleep(500);
 
-            Console.WriteLine($"M занчение для теста: {value}");
-            return value;
+            Console.Clear();
+
+            int convertedAnswerCoef = ConvertToOneZero(zeroIsFind);
+
+            Console.Write(Convert.ToChar(convertedAnswerCoef * 'Y' + (1 - convertedAnswerCoef) * 'N'));
+            Console.Write(Convert.ToChar(convertedAnswerCoef * 'e' + (1 - convertedAnswerCoef) * 'o'));
+            Console.Write(Convert.ToChar(convertedAnswerCoef * 's'));
+            Console.WriteLine();
         }
 
-        private static int[] InitialArrayBySize(int size) {
+        private static int ConvertToOneZero(int value) {
 
-            int[] nums = new int[size];
-            Console.WriteLine("Элементы массива: ");            
-            nums[0] = 0;
-            ConsoleTool.WriteLineConsoleGreenMessage($"Элемент 0: {nums[0]}");  
-           
-            for (int i = 1; i<nums.Length; i++)
-            {
-                var rand = new Random();
-                var data = rand.Next(0, 10);
-
-                nums[i] = data;
-
-                if (data.Equals(0))
-                {
-                    ConsoleTool.WriteLineConsoleGreenMessage($"Элемент {i}: {nums[i]}");
-                }
-                else
-                {
-                    Console.WriteLine($"Элемент {i}: {nums[i]}");
-                }                
-            }
-
-            return nums;
+            double d = Convert.ToDouble(value);
+            double roudedValue = Math.Round(d / (d + 1.0), MidpointRounding.AwayFromZero);
+            return Convert.ToInt32(roudedValue);
         }
 
-        private static bool isZeroInArrayBeforeIndex(int[] array , int searchBeforeIndex) {            
+        private static void translateResult(int result) {
 
-            var subArray = array[0..searchBeforeIndex];
+            int coef = result * 0 + (1 - result) * 1;
 
-            return Array.Exists(subArray, element => element.Equals(0));            
+            zeroIsFind = zeroIsFind + coef;
         }
     }
 }
